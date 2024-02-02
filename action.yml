@@ -1,0 +1,68 @@
+name: 'NGINX Bot'
+description: 'A GitHub Action to automate common tasks for NGINX repositories'
+author: 'Luca Comellini <lucacome>'
+
+# Add your action's branding here. This will appear on the GitHub Marketplace.
+branding:
+  icon: 'square'
+  color: 'gray-dark'
+
+# Define your inputs here.
+inputs:
+  github-token:
+    description: 'GitHub Token as provided by secrets'
+    default: ${{ github.token }}
+    required: true
+  reply-to-issues:
+    description: 'Whether to reply to issues opened by community members'
+    default: 'true'
+    required: false
+  reply-to-prs:
+    description: 'Whether to reply to PRs opened by community members'
+    default: 'true'
+    required: false
+  message-issue:
+    description:
+      'Message to send when an issue is opened by a community member. Only used
+      if `reply-to-issues` is set to `true`'
+    default: |
+      Thanks for opening this issue, please be sure to check out our [Contributing Guidelines](./CONTRIBUTING.md) and the [Issue Lifecycle](./ISSUE_LIFECYCLE.md) while you wait for somebody on the team to take a look at this.
+    required: false
+  message-pr:
+    description:
+      'Message to send when a PR is opened by a community member. Only used if
+      `reply-to-prs` is set to `true`'
+    default:
+      'Thanks for opening this pull request, please be sure to check out our
+      [Contributing Guidelines](./CONTRIBUTING.md)'
+    required: false
+  external-contributor-label:
+    description: 'Label to add to PRs from external contributors'
+    default: 'community'
+    required: false
+  release-notes-label:
+    description:
+      'Label to add to PRs that should be included in the release notes'
+    default: 'release-notes'
+    required: false
+  pr-assignee-from-issue:
+    description:
+      'Assign community PRs to the person assigned to the issue specified'
+    default: ''
+    required: false
+  warn-missing-issue:
+    description: 'Whether to warn when a PR is missing an issue reference'
+    default: 'false'
+    required: false
+  missing-issue-message:
+    description:
+      'Message to send when a PR is missing an issue reference. Only used if
+      `warn-missing-issue` is set to `true`'
+    default: |
+      Please make sure to include the issue number in the PR description to automatically close the issue when the PR is merged.
+      See [Linking a pull request to an issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) for details.
+    required: false
+
+runs:
+  using: node20
+  main: dist/index.js
