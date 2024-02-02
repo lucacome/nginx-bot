@@ -29017,6 +29017,22 @@ async function run() {
                 console.log(`Issue data: ${issueData.url}`);
             }
         }
+        // if it's a pull request, get all the info about the pull request
+        if (context.eventName === 'pull_request') {
+            const pullRequest = context.payload.pull_request;
+            if (pullRequest) {
+                console.log(`Pull request ${pullRequest.number} was ${pullRequest.action} by ${pullRequest.user.login}`);
+                console.log(`author_association: ${pullRequest.author_association}`);
+                console.log(`milestone: ${pullRequest.milestone}`);
+                console.log(`labels: ${pullRequest.labels.map((label) => label.name)}`);
+                console.log(`assignees: ${pullRequest.assignees.map((assignee) => assignee.login)}`);
+                const { data: pullRequestData } = await client.rest.pulls.get({
+                    ...context.repo,
+                    pull_number: pullRequest.number
+                });
+                console.log(`Pull request data: ${pullRequestData.url}`);
+            }
+        }
         // Set outputs for other workflow steps to use
         core.setOutput('time', new Date().toTimeString());
     }

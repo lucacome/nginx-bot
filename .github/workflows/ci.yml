@@ -2,7 +2,11 @@ name: Continuous Integration
 
 on:
   issues:
+    types:
+      - opened
   pull_request:
+    types:
+      - opened
   # push:
   #   branches:
   #     - main

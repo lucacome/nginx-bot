@@ -33,6 +33,7 @@ export async function run(): Promise<void> {
         )
         console.log(`author_association: ${issue.author_association}`)
         console.log(`milestone: ${issue.milestone}`)
+
         // print all the labels
         console.log(`labels: ${issue.labels.map((label: any) => label.name)}`)
         console.log(
@@ -43,6 +44,28 @@ export async function run(): Promise<void> {
           issue_number: issue.number
         })
         console.log(`Issue data: ${issueData.url}`)
+      }
+    }
+    // if it's a pull request, get all the info about the pull request
+    if (context.eventName === 'pull_request') {
+      const pullRequest = context.payload.pull_request
+      if (pullRequest) {
+        console.log(
+          `Pull request ${pullRequest.number} was ${pullRequest.action} by ${pullRequest.user.login}`
+        )
+        console.log(`author_association: ${pullRequest.author_association}`)
+        console.log(`milestone: ${pullRequest.milestone}`)
+        console.log(
+          `labels: ${pullRequest.labels.map((label: any) => label.name)}`
+        )
+        console.log(
+          `assignees: ${pullRequest.assignees.map((assignee: any) => assignee.login)}`
+        )
+        const { data: pullRequestData } = await client.rest.pulls.get({
+          ...context.repo,
+          pull_number: pullRequest.number
+        })
+        console.log(`Pull request data: ${pullRequestData.url}`)
       }
     }
 
