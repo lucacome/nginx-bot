@@ -11,9 +11,9 @@ permissions:
   contents: read
   issues: write
 
-concurrency:
-  group: ${{ github.ref_name }}-ci
-  cancel-in-progress: true
+# concurrency:
+#   group: ${{ github.ref_name }}-ci
+#   cancel-in-progress: true
 
 jobs:
   test-typescript:
