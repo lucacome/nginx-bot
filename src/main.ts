@@ -33,9 +33,11 @@ export async function run(): Promise<void> {
         )
         console.log(`author_association: ${issue.author_association}`)
         console.log(`milestone: ${issue.milestone}`)
-        console.log(`labels: ${issue.labels}`)
-        console.log(`assignees: ${issue.assignees}`)
-
+        // print all the labels
+        console.log(`labels: ${issue.labels.map((label: any) => label.name)}`)
+        console.log(
+          `assignees: ${issue.assignees.map((assignee: any) => assignee.login)}`
+        )
         const { data: issueData } = await client.rest.issues.get({
           ...context.repo,
           issue_number: issue.number
