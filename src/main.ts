@@ -31,6 +31,10 @@ export async function run(): Promise<void> {
         console.log(
           `Issue ${issue.number} was ${issue.action} by ${issue.user.login}`
         )
+        console.log(`author_association: ${issue.author_association}`)
+        console.log(`milestone: ${issue.milestone}`)
+        console.log(`labels: ${issue.labels}`)
+        console.log(`assignees: ${issue.assignees}`)
 
         const { data: issueData } = await client.rest.issues.get({
           ...context.repo,
