@@ -29013,7 +29013,7 @@ async function run() {
                     ...context.repo,
                     issue_number: issue.number
                 });
-                console.log(`Issue data: ${JSON.stringify(issueData)}`);
+                console.log(`Issue data: ${issueData.url}`);
             }
         }
         // Set outputs for other workflow steps to use
