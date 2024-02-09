@@ -69,12 +69,23 @@ export async function run(): Promise<void> {
         console.log(`Pull request data: ${pullRequestData.url}`)
         console.log(`Pull request body: ${pullRequestData.body}`)
 
-        // if the author of the pull request is not a member of the organization, add a label
-        if (pullRequest.author_association !== 'MEMBER') {
+        // if the author of the pull request is not a member of the organization or a collaborator, add a label
+        if (
+          pullRequest.author_association !== 'MEMBER' &&
+          pullRequest.author_association !== 'COLLABORATOR'
+        ) {
           await client.rest.issues.addLabels({
             ...context.repo,
             issue_number: pullRequest.number,
             labels: ['external']
+          })
+        }
+        // if the author is a first time contributor, send a welcome message
+        if (pullRequest.author_association !== 'FIRST_TIME_CONTRIBUTOR') {
+          await client.rest.issues.createComment({
+            ...context.repo,
+            issue_number: pullRequest.number,
+            body: `Welcome to the project, @${pullRequest.user.login}!`
           })
         }
       }
