@@ -29042,13 +29042,27 @@ async function run() {
                         labels: ['external']
                     });
                 }
-                // if the author is a first time contributor, send a welcome message
-                if (pullRequest.author_association !== 'FIRST_TIME_CONTRIBUTOR') {
-                    await client.rest.issues.createComment({
+                // if the author is a first time contributor, send a welcome message if one doesn't already exist
+                if (pullRequest.author_association === 'FIRST_TIME_CONTRIBUTOR') {
+                    const { data: comments } = await client.rest.issues.listComments({
                         ...context.repo,
-                        issue_number: pullRequest.number,
-                        body: `Welcome to the project, @${pullRequest.user.login}!`
+                        issue_number: pullRequest.number
                     });
+                    const existingComment = comments.find(comment => comment.body?.includes('Welcome to the project!'));
+                    if (!existingComment) {
+                        await client.rest.issues.createComment({
+                            ...context.repo,
+                            issue_number: pullRequest.number,
+                            body: `Welcome to the project, and thank you for your contribution @${pullRequest.user.login}! 🎉`
+                        });
+                    }
+                    else {
+                        await client.rest.issues.updateComment({
+                            ...context.repo,
+                            comment_id: existingComment.id,
+                            body: `Welcome to the project, and thank you for your contribution @${pullRequest.user.login}! 🎉`
+                        });
+                    }
                 }
             }
         }
