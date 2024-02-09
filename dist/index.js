@@ -29015,6 +29015,7 @@ async function run() {
                     issue_number: issue.number
                 });
                 console.log(`Issue data: ${issueData.url}`);
+                console.log(`Issue body: ${issueData.body}`);
             }
         }
         // if it's a pull request, get all the info about the pull request
@@ -29031,6 +29032,7 @@ async function run() {
                     pull_number: pullRequest.number
                 });
                 console.log(`Pull request data: ${pullRequestData.url}`);
+                console.log(`Pull request body: ${pullRequestData.body}`);
             }
         }
         // Set outputs for other workflow steps to use
