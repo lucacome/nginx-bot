@@ -89,7 +89,7 @@ export async function run(): Promise<void> {
           })
 
           const existingComment = comments.find(comment =>
-            comment.body?.includes('Welcome to the project!')
+            comment.body?.includes('Welcome to the project')
           )
           if (!existingComment) {
             await client.rest.issues.createComment({

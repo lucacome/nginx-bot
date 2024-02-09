@@ -29049,7 +29049,7 @@ async function run() {
                         ...context.repo,
                         issue_number: pullRequest.number
                     });
-                    const existingComment = comments.find(comment => comment.body?.includes('Welcome to the project!'));
+                    const existingComment = comments.find(comment => comment.body?.includes('Welcome to the project'));
                     if (!existingComment) {
                         await client.rest.issues.createComment({
                             ...context.repo,
