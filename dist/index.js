@@ -29033,6 +29033,14 @@ async function run() {
                 });
                 console.log(`Pull request data: ${pullRequestData.url}`);
                 console.log(`Pull request body: ${pullRequestData.body}`);
+                // if the author of the pull request is not a member of the organization, add a label
+                if (pullRequest.author_association !== 'MEMBER') {
+                    await client.rest.issues.addLabels({
+                        ...context.repo,
+                        issue_number: pullRequest.number,
+                        labels: ['external']
+                    });
+                }
             }
         }
         // Set outputs for other workflow steps to use
