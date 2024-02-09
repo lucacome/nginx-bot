@@ -29043,7 +29043,8 @@ async function run() {
                     });
                 }
                 // if the author is a first time contributor, send a welcome message if one doesn't already exist
-                if (pullRequest.author_association === 'FIRST_TIME_CONTRIBUTOR') {
+                if (pullRequest.author_association !== 'FIRST_TIME_CONTRIBUTOR') {
+                    // TODO change this
                     const { data: comments } = await client.rest.issues.listComments({
                         ...context.repo,
                         issue_number: pullRequest.number
