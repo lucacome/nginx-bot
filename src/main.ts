@@ -201,11 +201,15 @@ export async function run(): Promise<void> {
         labels: [inputs.releaseNotesLabel]
       })
     } else {
-      await client.rest.issues.removeLabel({
-        ...context.repo,
-        issue_number: issue.number,
-        name: inputs.releaseNotesLabel
-      })
+      try {
+        await client.rest.issues.removeLabel({
+          ...context.repo,
+          issue_number: issue.number,
+          name: inputs.releaseNotesLabel
+        })
+      } catch (error) {
+        core.info(`Label not found: ${inputs.releaseNotesLabel}`)
+      }
     }
     // Set outputs for other workflow steps to use
   } catch (error) {
