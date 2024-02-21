@@ -185,9 +185,10 @@ export async function run(): Promise<void> {
     }
 
     // find code block in the issue body
-    const codeBlock = issue.body?.match(/```release-notes([\s\S]*?)```/g)
-    if (codeBlock) {
-      core.info(`codeBlock: ${codeBlock}`)
+    const match = issue.body?.match(/```release-notes([\s\S]*?)```/)
+    if (match) {
+      const note = match[1].trim()
+      core.info(`release-notes: ${note}`)
     }
 
     // Set outputs for other workflow steps to use
