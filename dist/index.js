@@ -29162,6 +29162,7 @@ async function run() {
                 core.debug(`Label not found: ${inputs.releaseNotesLabel}`);
             }
         }
+        core.info(`Labels: ${labels}`);
         // Set outputs for other workflow steps to use
     }
     catch (error) {

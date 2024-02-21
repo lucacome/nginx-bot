@@ -213,6 +213,7 @@ export async function run(): Promise<void> {
         core.debug(`Label not found: ${inputs.releaseNotesLabel}`)
       }
     }
+    core.info(`Labels: ${labels}`)
     // Set outputs for other workflow steps to use
   } catch (error) {
     // Fail the workflow run if an error occurs
