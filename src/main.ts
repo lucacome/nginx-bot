@@ -200,7 +200,7 @@ export async function run(): Promise<void> {
         issue_number: issue.number,
         labels: [inputs.releaseNotesLabel]
       })
-      core.debug(`Label added: ${inputs.releaseNotesLabel} ${labels}`)
+      core.info(`Label added: ${inputs.releaseNotesLabel} ${labels}`)
     } else {
       try {
         await client.rest.issues.removeLabel({

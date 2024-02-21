@@ -29146,7 +29146,7 @@ async function run() {
                 issue_number: issue.number,
                 labels: [inputs.releaseNotesLabel]
             });
-            core.debug(`Label added: ${inputs.releaseNotesLabel} ${labels}`);
+            core.info(`Label added: ${inputs.releaseNotesLabel} ${labels}`);
         }
         else {
             try {
