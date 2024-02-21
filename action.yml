@@ -33,6 +33,10 @@ inputs:
     description: ''
     default: 'community'
     required: false
+  release-notes-label:
+    description: ''
+    default: 'release-notes'
+    required: false
   pr-assignee-from-issue:
     description: ''
     default: ''
@@ -44,8 +48,8 @@ inputs:
   missing-issue-message:
     description: ''
     default: |
-      Please make sure to include the issue number in the PR description to automatically close the issue when the PR gets merged.
-      See [Closing Issues via Pull Requests](https://github.blog/2013-05-14-closing-issues-via-pull-requests/) for details.
+      Please make sure to include the issue number in the PR description to automatically close the issue when the PR is merged.
+      See [Linking a pull request to an issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) for details.
     required: false
 # Define your outputs here.
 outputs:

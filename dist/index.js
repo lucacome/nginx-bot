@@ -28947,7 +28947,8 @@ function getInputs() {
         externalContributorLabel: core.getInput('external-contributor-label'),
         pullRequestAssigneIssue: core.getInput('pr-assignee-from-issue'),
         warnMissingIssue: core.getBooleanInput('warn-missing-issue'),
-        missingIssueMessage: core.getInput('missing-issue-message')
+        missingIssueMessage: core.getInput('missing-issue-message'),
+        releaseNotesLabel: core.getInput('release-notes-label')
     };
 }
 exports.getInputs = getInputs;
@@ -29040,6 +29041,7 @@ async function run() {
         core.info(`communityContributor: ${communityContributor}`);
         core.info(`assignees: ${assignees}`);
         core.info(`firstTimeContributor: ${firstTimeContributor}`);
+        core.info(`labels: ${issue.labels}`);
         core.endGroup();
         if (!communityContributor) {
             core.info(`Not a community contributor, exiting...`);
@@ -29131,11 +29133,26 @@ async function run() {
             });
             core.info(`Assignees added to the pull request: ${assignees}`);
         }
-        // find code block in the issue body
         const match = issue.body?.match(/```release-notes([\s\S]*?)```/);
+        let shouldAddLabel = false;
         if (match) {
             const note = match[1].trim();
             core.info(`release-notes: ${note}`);
+            shouldAddLabel = note.toUpperCase() !== 'NONE' && note !== '';
+        }
+        if (shouldAddLabel) {
+            await client.rest.issues.addLabels({
+                ...context.repo,
+                issue_number: issue.number,
+                labels: [inputs.releaseNotesLabel]
+            });
+        }
+        else {
+            await client.rest.issues.removeLabel({
+                ...context.repo,
+                issue_number: issue.number,
+                name: inputs.releaseNotesLabel
+            });
         }
         // Set outputs for other workflow steps to use
     }

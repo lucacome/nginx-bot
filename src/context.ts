@@ -10,6 +10,7 @@ export interface Inputs {
   pullRequestAssigneIssue: string
   warnMissingIssue: boolean
   missingIssueMessage: string
+  releaseNotesLabel: string
 }
 
 export function getInputs(): Inputs {
@@ -22,6 +23,7 @@ export function getInputs(): Inputs {
     externalContributorLabel: core.getInput('external-contributor-label'),
     pullRequestAssigneIssue: core.getInput('pr-assignee-from-issue'),
     warnMissingIssue: core.getBooleanInput('warn-missing-issue'),
-    missingIssueMessage: core.getInput('missing-issue-message')
+    missingIssueMessage: core.getInput('missing-issue-message'),
+    releaseNotesLabel: core.getInput('release-notes-label')
   }
 }
