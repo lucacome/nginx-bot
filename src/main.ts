@@ -44,7 +44,9 @@ export async function run(): Promise<void> {
         : context.payload.pull_request
 
     if (!issue) {
-      throw new Error('No issue or pull request found in the payload')
+      throw new Error(
+        'No issue or pull request found in the payload, this action only supports issues and pull requests.'
+      )
     }
 
     // member is a member of the organization that owns the repository
@@ -56,8 +58,8 @@ export async function run(): Promise<void> {
       issue?.author_association !== 'NONE'
     const firstTimeContributor =
       issue?.author_association === 'FIRST_TIME_CONTRIBUTOR'
-    const issueNumber = issue?.number
-    const assignees = issue?.assignees
+    const issueNumber = issue.number
+    const assignees = issue.assignees
 
     core.startGroup(`Issue info`)
     core.info(`issueType: ${issueType}`)
@@ -66,6 +68,11 @@ export async function run(): Promise<void> {
     core.info(`assignees: ${assignees}`)
     core.info(`firstTimeContributor: ${firstTimeContributor}`)
     core.endGroup()
+
+    if (!communityContributor) {
+      core.info(`Not a community contributor, exiting...`)
+      return
+    }
 
     const shouldReply =
       issueType === 'issue' ? inputs.replyToIssue : inputs.replyToPullRequest
@@ -82,8 +89,6 @@ export async function run(): Promise<void> {
       message = message + `\n\n${issueMessage}`
 
       if (issueType === 'pull request' && inputs.warnMissingIssue) {
-        // if it's a pull request, get linked issues from graphql
-        // const { pullRequestData } = await graphql({
         const { repository } = await graphql<{ repository: Repository }>({
           query: `
 			query ($owner: String!, $name: String!, $number: Int!) {
@@ -118,7 +123,6 @@ export async function run(): Promise<void> {
           (repository.pullRequest?.closingIssuesReferences?.edges?.length ??
             0) > 0
 
-        // if the PR doesn't have a linked issue, send a message to the PR author
         if (!hasLinkedIssues) {
           message = message + `\n\n${inputs.missingIssueMessage}`
         }
@@ -126,7 +130,6 @@ export async function run(): Promise<void> {
 
       core.info(`message: ${message}`)
 
-      // get all the comments on the issue
       const { data: comments } = await client.rest.issues.listComments({
         ...context.repo,
         issue_number: issue.number
@@ -152,73 +155,29 @@ export async function run(): Promise<void> {
       }
     }
 
-    if (communityContributor) {
-      await client.rest.issues.addLabels({
+    await client.rest.issues.addLabels({
+      ...context.repo,
+      issue_number: issue.number,
+      labels: [inputs.externalContributorLabel]
+    })
+
+    if (inputs.pullRequestAssigneIssue && issueType === 'pull request') {
+      // convert inputs.pullRequestAssigneIssue to number
+      const communityIssueNumber = parseInt(inputs.pullRequestAssigneIssue)
+
+      const { data: communityIssue } = await client.rest.issues.get({
+        ...context.repo,
+        issue_number: communityIssueNumber
+      })
+      const assignees =
+        communityIssue.assignees?.map(assignee => assignee.login) ?? []
+
+      await client.rest.issues.addAssignees({
         ...context.repo,
         issue_number: issue.number,
-        labels: [inputs.externalContributorLabel]
+        assignees: [...assignees]
       })
     }
-    // if it's a pull request, get all the info about the pull request
-    // if (context.eventName === 'pull_request') {
-    //   const pullRequest = context.payload.pull_request
-    //   if (pullRequest) {
-    //     console.log(
-    //       `Pull request ${pullRequest.number} was ${pullRequest.action} by ${pullRequest.user.login}`
-    //     )
-    //     console.log(`author_association: ${pullRequest.author_association}`)
-    //     console.log(`milestone: ${pullRequest.milestone}`)
-    //     console.log(
-    //       `labels: ${pullRequest.labels.map((label: any) => label.name)}`
-    //     )
-    //     console.log(
-    //       `assignees: ${pullRequest.assignees.map((assignee: any) => assignee.login)}`
-    //     )
-    //     const { data: pullRequestData } = await client.rest.pulls.get({
-    //       ...context.repo,
-    //       pull_number: pullRequest.number
-    //     })
-    //     console.log(`Pull request data: ${pullRequestData.url}`)
-    //     console.log(`Pull request body: ${pullRequestData.body}`)
-    //
-    //     // if the author of the pull request is not a member of the organization or a collaborator, add a label
-    //     if (
-    //       pullRequest.author_association !== 'MEMBER' &&
-    //       pullRequest.author_association !== 'COLLABORATOR'
-    //     ) {
-    //       await client.rest.issues.addLabels({
-    //         ...context.repo,
-    //         issue_number: pullRequest.number,
-    //         labels: ['external']
-    //       })
-    //     }
-    //     // if the author is a first time contributor, send a welcome message if one doesn't already exist
-    //     if (pullRequest.author_association !== 'FIRST_TIME_CONTRIBUTOR') {
-    //       // TODO change this
-    //       const { data: comments } = await client.rest.issues.listComments({
-    //         ...context.repo,
-    //         issue_number: pullRequest.number
-    //       })
-    //
-    //       const existingComment = comments.find(comment =>
-    //         comment.body?.includes('Welcome to the project')
-    //       )
-    //       if (!existingComment) {
-    //         await client.rest.issues.createComment({
-    //           ...context.repo,
-    //           issue_number: pullRequest.number,
-    //           body: `Welcome to the project, and thank you for your contribution @${pullRequest.user.login}! 🎉`
-    //         })
-    //       } else {
-    //         await client.rest.issues.updateComment({
-    //           ...context.repo,
-    //           comment_id: existingComment.id,
-    //           body: `Welcome to the project, and thank you for your contribution @${pullRequest.user.login}! 🎉`
-    //         })
-    //       }
-    //     }
-    //   }
-    // }
 
     // Set outputs for other workflow steps to use
   } catch (error) {

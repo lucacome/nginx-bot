@@ -35,7 +35,7 @@ inputs:
     required: false
   pr-assignee-from-issue:
     description: ''
-    default: ''
+    default: '5' #change to empty
     required: false
   warn-missing-issue:
     description: ''
@@ -44,7 +44,7 @@ inputs:
   missing-issue-message:
     description: ''
     default: |
-      Please make sure to include the issue number in the PR description to automatically close the issue when the PR mergers.
+      Please make sure to include the issue number in the PR description to automatically close the issue when the PR gets merged.
       See [Closing Issues via Pull Requests](https://github.blog/2013-05-14-closing-issues-via-pull-requests/) for details.
     required: false
 # Define your outputs here.
