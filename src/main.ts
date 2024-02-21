@@ -85,24 +85,26 @@ export async function run(): Promise<void> {
         // const { pullRequestData } = await graphql({
         const { repository } = await graphql<{ repository: Repository }>({
           query: `
-						query($owner: String!, $name: String!, $number: Int!) {
-							repository(owner: $owner, name: $name) {
+			query ($owner: String!, $name: String!, $number: Int!) {
+				repository(owner: $owner, name: $name) {
 					pullRequest(number: $number) {
-						id
-						closingIssuesReferences(first: 5) {
-							edges{
-							node {
-								id
-								body
-								number
-								title
-							}
-							}
+					id
+					closingIssuesReferences(first: 5) {
+						edges {
+						  node {
+							id
+							body
+							number
+							title
+						  }
 						}
 					}
-							}
-						}
-					`,
+					}
+				}
+			}`,
+          headers: {
+            authorization: `token ${inputs.githubToken}`
+          },
           owner: context.repo.owner,
           name: context.repo.repo,
           number: issue.number
