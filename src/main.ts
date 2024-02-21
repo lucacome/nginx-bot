@@ -161,7 +161,7 @@ export async function run(): Promise<void> {
       labels: [inputs.externalContributorLabel]
     })
 
-    if (inputs.pullRequestAssigneIssue && issueType === 'pull request') {
+    if (inputs.pullRequestAssigneIssue !== '' && issueType === 'pull request') {
       // convert inputs.pullRequestAssigneIssue to number
       const communityIssueNumber = parseInt(inputs.pullRequestAssigneIssue)
 
