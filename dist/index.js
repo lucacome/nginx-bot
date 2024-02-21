@@ -29156,13 +29156,13 @@ async function run() {
                     issue_number: issue.number,
                     name: inputs.releaseNotesLabel
                 });
-                core.debug(`Label removed: ${inputs.releaseNotesLabel} ${foo}`);
+                core.debug(`Label removed: ${inputs.releaseNotesLabel} ${foo.map(label => label.name)} `);
             }
             catch (error) {
                 core.debug(`Label not found: ${inputs.releaseNotesLabel}`);
             }
         }
-        core.info(`Labels: ${labels}`);
+        core.info(`Labels: ${labels.map(label => label.name)}`);
         // Set outputs for other workflow steps to use
     }
     catch (error) {
