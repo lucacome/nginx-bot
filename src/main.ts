@@ -78,6 +78,7 @@ export async function run(): Promise<void> {
       }
       const issueMessage =
         issueType === 'issue' ? inputs.messageIssue : inputs.messagePullRequest
+
       message = message + `\n\n${issueMessage}`
 
       if (issueType === 'pull request' && inputs.warnMissingIssue) {
@@ -125,12 +126,30 @@ export async function run(): Promise<void> {
 
       core.info(`message: ${message}`)
 
-      // add a comment to the issue
-      await client.rest.issues.createComment({
+      // get all the comments on the issue
+      const { data: comments } = await client.rest.issues.listComments({
         ...context.repo,
-        issue_number: issue.number,
-        body: message
+        issue_number: issue.number
       })
+
+      const existingComment = comments.find(comment =>
+        comment.body?.includes(issueMessage)
+      )
+
+      if (existingComment) {
+        await client.rest.issues.updateComment({
+          ...context.repo,
+          comment_id: existingComment.id,
+          body: message
+        })
+      } else {
+        // add a comment to the issue
+        await client.rest.issues.createComment({
+          ...context.repo,
+          issue_number: issue.number,
+          body: message
+        })
+      }
     }
 
     if (communityContributor) {
@@ -202,7 +221,6 @@ export async function run(): Promise<void> {
     // }
 
     // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)

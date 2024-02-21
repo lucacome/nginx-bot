@@ -29087,12 +29087,27 @@ async function run() {
                 }
             }
             core.info(`message: ${message}`);
-            // add a comment to the issue
-            await client.rest.issues.createComment({
+            // get all the comments on the issue
+            const { data: comments } = await client.rest.issues.listComments({
                 ...context.repo,
-                issue_number: issue.number,
-                body: message
+                issue_number: issue.number
             });
+            const existingComment = comments.find(comment => comment.body?.includes(issueMessage));
+            if (existingComment) {
+                await client.rest.issues.updateComment({
+                    ...context.repo,
+                    comment_id: existingComment.id,
+                    body: message
+                });
+            }
+            else {
+                // add a comment to the issue
+                await client.rest.issues.createComment({
+                    ...context.repo,
+                    issue_number: issue.number,
+                    body: message
+                });
+            }
         }
         if (communityContributor) {
             await client.rest.issues.addLabels({
@@ -29162,7 +29177,6 @@ async function run() {
         //   }
         // }
         // Set outputs for other workflow steps to use
-        core.setOutput('time', new Date().toTimeString());
     }
     catch (error) {
         // Fail the workflow run if an error occurs
