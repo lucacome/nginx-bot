@@ -110,7 +110,10 @@ export async function run(): Promise<void> {
           number: issue.number
         })
         core.info(
-          `issue linked issues: ${repository.pullRequest?.closingIssuesReferences}`
+          `closingIssuesReferences: ${repository.pullRequest?.closingIssuesReferences?.edges}`
+        )
+        core.info(
+          `issues ids: ${repository.pullRequest?.closingIssuesReferences?.edges?.map((issue: any) => issue.node.id)}`
         )
       }
     }
