@@ -29114,8 +29114,9 @@ async function run() {
             issue_number: issue.number,
             labels: [inputs.externalContributorLabel]
         });
-        if (inputs.pullRequestAssigneIssue !== '' && issueType === 'pull request') {
-            // convert inputs.pullRequestAssigneIssue to number
+        if (inputs.pullRequestAssigneIssue !== '' &&
+            issueType === 'pull request' &&
+            issue.assignees.length === 0) {
             const communityIssueNumber = parseInt(inputs.pullRequestAssigneIssue);
             const { data: communityIssue } = await client.rest.issues.get({
                 ...context.repo,
@@ -29127,6 +29128,7 @@ async function run() {
                 issue_number: issue.number,
                 assignees: [...assignees]
             });
+            core.info(`Assignees added to the pull request: ${assignees}`);
         }
         // Set outputs for other workflow steps to use
     }

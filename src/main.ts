@@ -161,8 +161,11 @@ export async function run(): Promise<void> {
       labels: [inputs.externalContributorLabel]
     })
 
-    if (inputs.pullRequestAssigneIssue !== '' && issueType === 'pull request') {
-      // convert inputs.pullRequestAssigneIssue to number
+    if (
+      inputs.pullRequestAssigneIssue !== '' &&
+      issueType === 'pull request' &&
+      issue.assignees.length === 0
+    ) {
       const communityIssueNumber = parseInt(inputs.pullRequestAssigneIssue)
 
       const { data: communityIssue } = await client.rest.issues.get({
@@ -177,6 +180,7 @@ export async function run(): Promise<void> {
         issue_number: issue.number,
         assignees: [...assignees]
       })
+      core.info(`Assignees added to the pull request: ${assignees}`)
     }
 
     // Set outputs for other workflow steps to use
