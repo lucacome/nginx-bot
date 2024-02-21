@@ -157,7 +157,7 @@ export async function run(): Promise<void> {
       }
     }
 
-    await client.rest.issues.addLabels({
+    let { data: labels } = await client.rest.issues.addLabels({
       ...context.repo,
       issue_number: issue.number,
       labels: [inputs.externalContributorLabel]
@@ -195,22 +195,20 @@ export async function run(): Promise<void> {
     }
 
     if (shouldAddLabel) {
-      const { data: labels } = await client.rest.issues.addLabels({
+      ;({ data: labels } = await client.rest.issues.addLabels({
         ...context.repo,
         issue_number: issue.number,
         labels: [inputs.releaseNotesLabel]
-      })
-      core.info(
-        `Labels added: ${inputs.releaseNotesLabel} ${labels.map(label => label.name)}`
-      )
+      }))
+      core.debug(`Labels added: ${inputs.releaseNotesLabel}`)
     } else {
       try {
-        await client.rest.issues.removeLabel({
+        const { data: foo } = await client.rest.issues.removeLabel({
           ...context.repo,
           issue_number: issue.number,
           name: inputs.releaseNotesLabel
         })
-        core.debug(`Label removed: ${inputs.releaseNotesLabel}`)
+        core.debug(`Label removed: ${inputs.releaseNotesLabel} ${foo}`)
       } catch (error) {
         core.debug(`Label not found: ${inputs.releaseNotesLabel}`)
       }
