@@ -29141,11 +29141,12 @@ async function run() {
             shouldAddLabel = note.toUpperCase() !== 'NONE' && note !== '';
         }
         if (shouldAddLabel) {
-            await client.rest.issues.addLabels({
+            const labels = await client.rest.issues.addLabels({
                 ...context.repo,
                 issue_number: issue.number,
                 labels: [inputs.releaseNotesLabel]
             });
+            core.debug(`Label added: ${inputs.releaseNotesLabel} ${labels}`);
         }
         else {
             try {
@@ -29154,9 +29155,10 @@ async function run() {
                     issue_number: issue.number,
                     name: inputs.releaseNotesLabel
                 });
+                core.debug(`Label removed: ${inputs.releaseNotesLabel}`);
             }
             catch (error) {
-                core.info(`Label not found: ${inputs.releaseNotesLabel}`);
+                core.debug(`Label not found: ${inputs.releaseNotesLabel}`);
             }
         }
         // Set outputs for other workflow steps to use
