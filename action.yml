@@ -27,7 +27,7 @@ inputs:
     required: false
   message-pr:
     description: ''
-    default: 'this is a messsage PR'
+    default: 'this is a message PR'
     required: false
   external-contributor-label:
     description: ''
