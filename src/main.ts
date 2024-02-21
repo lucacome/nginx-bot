@@ -203,14 +203,12 @@ export async function run(): Promise<void> {
       core.debug(`Labels added: ${inputs.releaseNotesLabel}`)
     } else {
       try {
-        const { data: foo } = await client.rest.issues.removeLabel({
+        ;({ data: labels } = await client.rest.issues.removeLabel({
           ...context.repo,
           issue_number: issue.number,
           name: inputs.releaseNotesLabel
-        })
-        core.debug(
-          `Label removed: ${inputs.releaseNotesLabel} ${foo.map(label => label.name)} `
-        )
+        }))
+        core.debug(`Label removed: ${inputs.releaseNotesLabel}`)
       } catch (error) {
         core.debug(`Label not found: ${inputs.releaseNotesLabel}`)
       }
