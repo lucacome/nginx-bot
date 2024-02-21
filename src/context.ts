@@ -15,12 +15,12 @@ export interface Inputs {
 export function getInputs(): Inputs {
   return {
     githubToken: core.getInput('github-token'),
-    replyToIssue: core.getBooleanInput('reply-to-issue'),
-    replyToPullRequest: core.getBooleanInput('reply-to-pull-request'),
+    replyToIssue: core.getBooleanInput('reply-to-issues'),
+    replyToPullRequest: core.getBooleanInput('reply-to-prs'),
     messageIssue: core.getInput('message-issue'),
-    messagePullRequest: core.getInput('message-pull-request'),
+    messagePullRequest: core.getInput('message-pr'),
     externalContributorLabel: core.getInput('external-contributor-label'),
-    pullRequestAssigneIssue: core.getInput('pull-request-assignee-issue'),
+    pullRequestAssigneIssue: core.getInput('pr-assignee-from-issue'),
     warnMissingIssue: core.getBooleanInput('warn-missing-issue'),
     missingIssueMessage: core.getInput('missing-issue-message')
   }
