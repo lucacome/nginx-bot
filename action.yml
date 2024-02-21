@@ -23,11 +23,11 @@ inputs:
     required: false
   message-issue:
     description: ''
-    default: ''
+    default: 'this is a message issue'
     required: false
   message-pr:
     description: ''
-    default: ''
+    default: 'this is a messsage PR'
     required: false
   external-contributor-label:
     description: ''
@@ -37,13 +37,13 @@ inputs:
     description: ''
     default: ''
     required: false
-  welcome-new-contributor:
-    description: ''
-    default: 'true'
-    required: false
   warn-missing-issue:
     description: ''
     default: 'false'
+    required: false
+  missing-issue-message:
+    description: ''
+    default: 'missing linked issue'
     required: false
 # Define your outputs here.
 outputs:

@@ -8,6 +8,8 @@ export interface Inputs {
   messagePullRequest: string
   externalContributorLabel: string
   pullRequestAssigneIssue: string
+  warnMissingIssue: boolean
+  missingIssueMessage: string
 }
 
 export function getInputs(): Inputs {
@@ -18,6 +20,8 @@ export function getInputs(): Inputs {
     messageIssue: core.getInput('message-issue'),
     messagePullRequest: core.getInput('message-pull-request'),
     externalContributorLabel: core.getInput('external-contributor-label'),
-    pullRequestAssigneIssue: core.getInput('pull-request-assignee-issue')
+    pullRequestAssigneIssue: core.getInput('pull-request-assignee-issue'),
+    warnMissingIssue: core.getInput('warn-missing-issue') === 'true',
+    missingIssueMessage: core.getInput('missing-issue-message')
   }
 }

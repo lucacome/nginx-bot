@@ -33,6 +33,10 @@ export async function run(): Promise<void> {
         ? context.payload.issue
         : context.payload.pull_request
 
+    if (!issue) {
+      throw new Error('No issue or pull request found in the payload')
+    }
+
     // member is a member of the organization that owns the repository
     // collaborator is an outside collaborator that has been invited to collaborate on the repository
     // none is probably a bot account
@@ -53,27 +57,20 @@ export async function run(): Promise<void> {
     core.info(`firstTimeContributor: ${firstTimeContributor}`)
     core.endGroup()
 
-    if (issue) {
-      // const { data: issueData } = await client.rest.issues.get({
-      //   ...context.repo,
-      //   issue_number: issue.number
-      // })
-      // const issueBody = issueData.body
+    const shouldReply =
+      issueType === 'issue' ? inputs.replyToIssue : inputs.replyToPullRequest
 
-      if (communityContributor) {
-        await client.rest.issues.addLabels({
-          ...context.repo,
-          issue_number: issue.number,
-          labels: [inputs.externalContributorLabel]
-        })
-      }
-      var message = 'ciao'
+    if (shouldReply) {
+      var message = `Hi @${issue.user.login}!`
 
       if (firstTimeContributor) {
-        message = message + 'ciao2'
+        message = message + ` Welcome to the project! 🎉`
       }
+      const issueMessage =
+        issueType === 'issue' ? inputs.messageIssue : inputs.messagePullRequest
+      message = `\n\n${issueMessage}`
 
-      if (issueType === 'pull request') {
+      if (issueType === 'pull request' && inputs.warnMissingIssue) {
         // if it's a pull request, get linked issues from graphql
         // const { pullRequestData } = await graphql({
         const { repository } = await graphql<{ repository: Repository }>({
@@ -112,18 +109,25 @@ export async function run(): Promise<void> {
 
         // if the PR doesn't have a linked issue, send a message to the PR author
         if (!hasLinkedIssues) {
-          message = message + 'ciao3'
+          message = message + `\n\n${inputs.missingIssueMessage}`
         }
-
-        // add a comment to the issue
-        await client.rest.issues.createComment({
-          ...context.repo,
-          issue_number: issue.number,
-          body: message
-        })
       }
+
+      // add a comment to the issue
+      await client.rest.issues.createComment({
+        ...context.repo,
+        issue_number: issue.number,
+        body: message
+      })
     }
 
+    if (communityContributor) {
+      await client.rest.issues.addLabels({
+        ...context.repo,
+        issue_number: issue.number,
+        labels: [inputs.externalContributorLabel]
+      })
+    }
     // if it's a pull request, get all the info about the pull request
     // if (context.eventName === 'pull_request') {
     //   const pullRequest = context.payload.pull_request
