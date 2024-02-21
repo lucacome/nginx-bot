@@ -24,89 +24,120 @@ export async function run(): Promise<void> {
     core.info(`inputs: ${inputs}`)
     const client = github.getOctokit(inputs.githubToken)
 
-    // if it's an issue, get all the info about the issue
-    if (context.eventName === 'issues') {
-      const issue = context.payload.issue
-      if (issue) {
-        console.log(
-          `Issue ${issue.number} was ${issue.action} by ${issue.user.login}`
-        )
-        console.log(`author_association: ${issue.author_association}`)
-        console.log(`milestone: ${issue.milestone}`)
+    const issueType = context.eventName === 'issues' ? 'issue' : 'pull request'
+    const issue =
+      issueType === 'issue'
+        ? context.payload.issue
+        : context.payload.pull_request
 
-        // print all the labels
-        console.log(`labels: ${issue.labels.map((label: any) => label.name)}`)
-        console.log(
-          `assignees: ${issue.assignees.map((assignee: any) => assignee.login)}`
-        )
-        const { data: issueData } = await client.rest.issues.get({
+    // member is a member of the organization that owns the repository
+    // collaborator is an outside collaborator that has been invited to collaborate on the repository
+    // none is probably a bot account
+    const communityContributor =
+      issue?.author_association !== 'MEMBER' &&
+      issue?.author_association !== 'COLLABORATOR' &&
+      issue?.author_association !== 'NONE'
+    const firstTimeContributor =
+      issue?.author_association === 'FIRST_TIME_CONTRIBUTOR'
+    const issueNumber = issue?.number
+    const assignees = issue?.assignees
+
+    core.startGroup(`Issue info`)
+    core.info(`issueType: ${issueType}`)
+    core.info(`issueNumber: ${issueNumber}`)
+    core.info(`communityContributor: ${communityContributor}`)
+    core.info(`assignees: ${assignees}`)
+    core.info(`firstTimeContributor: ${firstTimeContributor}`)
+    core.endGroup()
+
+    if (issue) {
+      // const { data: issueData } = await client.rest.issues.get({
+      //   ...context.repo,
+      //   issue_number: issue.number
+      // })
+      // const issueBody = issueData.body
+
+      if (communityContributor) {
+        await client.rest.issues.addLabels({
           ...context.repo,
-          issue_number: issue.number
+          issue_number: issue.number,
+          labels: [inputs.externalContributorLabel]
         })
-        console.log(`Issue data: ${issueData.url}`)
-        console.log(`Issue body: ${issueData.body}`)
       }
+      var message = 'ciao'
+
+      if (firstTimeContributor) {
+        message = message + 'ciao2'
+      }
+
+      // add a comment to the issue
+      await client.rest.issues.createComment({
+        ...context.repo,
+        issue_number: issue.number,
+        body: 'welcome change the message'
+      })
     }
+
     // if it's a pull request, get all the info about the pull request
-    if (context.eventName === 'pull_request') {
-      const pullRequest = context.payload.pull_request
-      if (pullRequest) {
-        console.log(
-          `Pull request ${pullRequest.number} was ${pullRequest.action} by ${pullRequest.user.login}`
-        )
-        console.log(`author_association: ${pullRequest.author_association}`)
-        console.log(`milestone: ${pullRequest.milestone}`)
-        console.log(
-          `labels: ${pullRequest.labels.map((label: any) => label.name)}`
-        )
-        console.log(
-          `assignees: ${pullRequest.assignees.map((assignee: any) => assignee.login)}`
-        )
-        const { data: pullRequestData } = await client.rest.pulls.get({
-          ...context.repo,
-          pull_number: pullRequest.number
-        })
-        console.log(`Pull request data: ${pullRequestData.url}`)
-        console.log(`Pull request body: ${pullRequestData.body}`)
-
-        // if the author of the pull request is not a member of the organization or a collaborator, add a label
-        if (
-          pullRequest.author_association !== 'MEMBER' &&
-          pullRequest.author_association !== 'COLLABORATOR'
-        ) {
-          await client.rest.issues.addLabels({
-            ...context.repo,
-            issue_number: pullRequest.number,
-            labels: ['external']
-          })
-        }
-        // if the author is a first time contributor, send a welcome message if one doesn't already exist
-        if (pullRequest.author_association !== 'FIRST_TIME_CONTRIBUTOR') {
-          // TODO change this
-          const { data: comments } = await client.rest.issues.listComments({
-            ...context.repo,
-            issue_number: pullRequest.number
-          })
-
-          const existingComment = comments.find(comment =>
-            comment.body?.includes('Welcome to the project')
-          )
-          if (!existingComment) {
-            await client.rest.issues.createComment({
-              ...context.repo,
-              issue_number: pullRequest.number,
-              body: `Welcome to the project, and thank you for your contribution @${pullRequest.user.login}! 🎉`
-            })
-          } else {
-            await client.rest.issues.updateComment({
-              ...context.repo,
-              comment_id: existingComment.id,
-              body: `Welcome to the project, and thank you for your contribution @${pullRequest.user.login}! 🎉`
-            })
-          }
-        }
-      }
-    }
+    // if (context.eventName === 'pull_request') {
+    //   const pullRequest = context.payload.pull_request
+    //   if (pullRequest) {
+    //     console.log(
+    //       `Pull request ${pullRequest.number} was ${pullRequest.action} by ${pullRequest.user.login}`
+    //     )
+    //     console.log(`author_association: ${pullRequest.author_association}`)
+    //     console.log(`milestone: ${pullRequest.milestone}`)
+    //     console.log(
+    //       `labels: ${pullRequest.labels.map((label: any) => label.name)}`
+    //     )
+    //     console.log(
+    //       `assignees: ${pullRequest.assignees.map((assignee: any) => assignee.login)}`
+    //     )
+    //     const { data: pullRequestData } = await client.rest.pulls.get({
+    //       ...context.repo,
+    //       pull_number: pullRequest.number
+    //     })
+    //     console.log(`Pull request data: ${pullRequestData.url}`)
+    //     console.log(`Pull request body: ${pullRequestData.body}`)
+    //
+    //     // if the author of the pull request is not a member of the organization or a collaborator, add a label
+    //     if (
+    //       pullRequest.author_association !== 'MEMBER' &&
+    //       pullRequest.author_association !== 'COLLABORATOR'
+    //     ) {
+    //       await client.rest.issues.addLabels({
+    //         ...context.repo,
+    //         issue_number: pullRequest.number,
+    //         labels: ['external']
+    //       })
+    //     }
+    //     // if the author is a first time contributor, send a welcome message if one doesn't already exist
+    //     if (pullRequest.author_association !== 'FIRST_TIME_CONTRIBUTOR') {
+    //       // TODO change this
+    //       const { data: comments } = await client.rest.issues.listComments({
+    //         ...context.repo,
+    //         issue_number: pullRequest.number
+    //       })
+    //
+    //       const existingComment = comments.find(comment =>
+    //         comment.body?.includes('Welcome to the project')
+    //       )
+    //       if (!existingComment) {
+    //         await client.rest.issues.createComment({
+    //           ...context.repo,
+    //           issue_number: pullRequest.number,
+    //           body: `Welcome to the project, and thank you for your contribution @${pullRequest.user.login}! 🎉`
+    //         })
+    //       } else {
+    //         await client.rest.issues.updateComment({
+    //           ...context.repo,
+    //           comment_id: existingComment.id,
+    //           body: `Welcome to the project, and thank you for your contribution @${pullRequest.user.login}! 🎉`
+    //         })
+    //       }
+    //     }
+    //   }
+    // }
 
     // Set outputs for other workflow steps to use
     core.setOutput('time', new Date().toTimeString())
