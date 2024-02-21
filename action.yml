@@ -43,7 +43,9 @@ inputs:
     required: false
   missing-issue-message:
     description: ''
-    default: 'missing linked issue'
+    default: |
+      Please make sure to include the issue number in the PR description to automatically close the issue when the PR mergers.
+      See [Closing Issues via Pull Requests](https://github.blog/2013-05-14-closing-issues-via-pull-requests/) for details.
     required: false
 # Define your outputs here.
 outputs:
