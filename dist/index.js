@@ -29092,7 +29092,9 @@ async function run() {
                 ...context.repo,
                 issue_number: issue.number
             });
-            const existingComment = comments.find(comment => comment.body?.includes(issueMessage));
+            const existingComment = comments.find(comment => core.info(`comment: ${comment.body}`)
+            // comment.body?.includes(issueMessage)
+            );
             if (existingComment) {
                 await client.rest.issues.updateComment({
                     ...context.repo,
