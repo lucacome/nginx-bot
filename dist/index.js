@@ -29047,6 +29047,7 @@ async function run() {
         }
         const shouldReply = issueType === 'issue' ? inputs.replyToIssue : inputs.replyToPullRequest;
         if (shouldReply) {
+            const COMMENT_MARKER = '<!-- nginx-bot-comment -->';
             var message = `Hi @${issue.user.login}!`;
             if (firstTimeContributor) {
                 message = message + ` Welcome to the project! 🎉`;
@@ -29087,12 +29088,13 @@ async function run() {
                     message = message + `\n\n${inputs.missingIssueMessage}`;
                 }
             }
+            message = message + `\n\n${COMMENT_MARKER}`;
             core.info(`message: ${message}`);
             const { data: comments } = await client.rest.issues.listComments({
                 ...context.repo,
                 issue_number: issue.number
             });
-            const existingComment = comments.find(comment => comment.body?.includes(issueMessage));
+            const existingComment = comments.find(comment => comment.body?.includes(COMMENT_MARKER));
             if (existingComment) {
                 await client.rest.issues.updateComment({
                     ...context.repo,
@@ -29101,7 +29103,6 @@ async function run() {
                 });
             }
             else {
-                // add a comment to the issue
                 await client.rest.issues.createComment({
                     ...context.repo,
                     issue_number: issue.number,
@@ -29129,6 +29130,11 @@ async function run() {
                 assignees: [...assignees]
             });
             core.info(`Assignees added to the pull request: ${assignees}`);
+        }
+        // find code block in the issue body
+        const codeBlock = issue.body?.match(/```release-notes[\s\S]*?```/g);
+        if (codeBlock) {
+            core.info(`codeBlock: ${codeBlock}`);
         }
         // Set outputs for other workflow steps to use
     }
