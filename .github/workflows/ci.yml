@@ -5,10 +5,12 @@ on:
     types:
       - opened
       - reopened
+      - edited
   pull_request:
     types:
       - opened
       - reopened
+      - edited
   # push:
   #   branches:
   #     - main
