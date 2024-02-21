@@ -35,11 +35,11 @@ inputs:
     required: false
   pr-assignee-from-issue:
     description: ''
-    default: '5' #change to empty
+    default: ''
     required: false
   warn-missing-issue:
     description: ''
-    default: 'true' #change to false
+    default: 'false'
     required: false
   missing-issue-message:
     description: ''
