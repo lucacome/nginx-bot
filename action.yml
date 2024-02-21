@@ -29,7 +29,7 @@ inputs:
     description: ''
     default: ''
     required: false
-  external-contribution-label:
+  external-contributor-label:
     description: ''
     default: 'community'
     required: false
@@ -37,7 +37,14 @@ inputs:
     description: ''
     default: ''
     required: false
-
+  welcome-new-contributor:
+    description: ''
+    default: 'true'
+    required: false
+  warn-missing-issue:
+    description: ''
+    default: 'false'
+    required: false
 # Define your outputs here.
 outputs:
   time:
