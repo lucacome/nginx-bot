@@ -195,12 +195,14 @@ export async function run(): Promise<void> {
     }
 
     if (shouldAddLabel) {
-      const labels = await client.rest.issues.addLabels({
+      const { data: labels } = await client.rest.issues.addLabels({
         ...context.repo,
         issue_number: issue.number,
         labels: [inputs.releaseNotesLabel]
       })
-      core.info(`Label added: ${inputs.releaseNotesLabel} ${labels}`)
+      core.info(
+        `Labels added: ${inputs.releaseNotesLabel} ${labels.map(label => label.name)}`
+      )
     } else {
       try {
         await client.rest.issues.removeLabel({
