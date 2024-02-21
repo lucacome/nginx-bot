@@ -29007,7 +29007,6 @@ async function run() {
         core.info(`runId: ${context.runId}`);
         core.endGroup();
         const inputs = (0, context_1.getInputs)();
-        core.info(`inputs: ${inputs}`);
         const client = github.getOctokit(inputs.githubToken);
         core.startGroup(`Settings info`);
         core.info(`replyToIssue: ${inputs.replyToIssue}`);
@@ -29049,7 +29048,7 @@ async function run() {
                 message = message + ` Welcome to the project! 🎉`;
             }
             const issueMessage = issueType === 'issue' ? inputs.messageIssue : inputs.messagePullRequest;
-            message = `\n\n${issueMessage}`;
+            message = message + `\n\n${issueMessage}`;
             if (issueType === 'pull request' && inputs.warnMissingIssue) {
                 // if it's a pull request, get linked issues from graphql
                 // const { pullRequestData } = await graphql({
@@ -29087,6 +29086,7 @@ async function run() {
                     message = message + `\n\n${inputs.missingIssueMessage}`;
                 }
             }
+            core.info(`message: ${message}`);
             // add a comment to the issue
             await client.rest.issues.createComment({
                 ...context.repo,

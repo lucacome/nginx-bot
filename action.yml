@@ -39,7 +39,7 @@ inputs:
     required: false
   warn-missing-issue:
     description: ''
-    default: 'false'
+    default: 'true' #change to false
     required: false
   missing-issue-message:
     description: ''

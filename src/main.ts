@@ -24,7 +24,6 @@ export async function run(): Promise<void> {
     core.endGroup()
 
     const inputs: Inputs = getInputs()
-    core.info(`inputs: ${inputs}`)
     const client = github.getOctokit(inputs.githubToken)
 
     core.startGroup(`Settings info`)
@@ -79,7 +78,7 @@ export async function run(): Promise<void> {
       }
       const issueMessage =
         issueType === 'issue' ? inputs.messageIssue : inputs.messagePullRequest
-      message = `\n\n${issueMessage}`
+      message = message + `\n\n${issueMessage}`
 
       if (issueType === 'pull request' && inputs.warnMissingIssue) {
         // if it's a pull request, get linked issues from graphql
@@ -123,6 +122,8 @@ export async function run(): Promise<void> {
           message = message + `\n\n${inputs.missingIssueMessage}`
         }
       }
+
+      core.info(`message: ${message}`)
 
       // add a comment to the issue
       await client.rest.issues.createComment({
