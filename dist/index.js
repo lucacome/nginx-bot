@@ -29132,7 +29132,7 @@ async function run() {
             core.info(`Assignees added to the pull request: ${assignees}`);
         }
         // find code block in the issue body
-        const codeBlock = issue.body?.match(/```release-notes[\s\S]*?```/g);
+        const codeBlock = issue.body?.match(/```release-notes([\s\S]*?)```/g);
         if (codeBlock) {
             core.info(`codeBlock: ${codeBlock}`);
         }
