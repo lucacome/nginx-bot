@@ -28940,13 +28940,13 @@ const core = __importStar(__nccwpck_require__(2186));
 function getInputs() {
     return {
         githubToken: core.getInput('github-token'),
-        replyToIssue: core.getInput('reply-to-issue') === 'true',
-        replyToPullRequest: core.getInput('reply-to-pull-request') === 'true',
+        replyToIssue: core.getBooleanInput('reply-to-issue'),
+        replyToPullRequest: core.getBooleanInput('reply-to-pull-request'),
         messageIssue: core.getInput('message-issue'),
         messagePullRequest: core.getInput('message-pull-request'),
         externalContributorLabel: core.getInput('external-contributor-label'),
         pullRequestAssigneIssue: core.getInput('pull-request-assignee-issue'),
-        warnMissingIssue: core.getInput('warn-missing-issue') === 'true',
+        warnMissingIssue: core.getBooleanInput('warn-missing-issue'),
         missingIssueMessage: core.getInput('missing-issue-message')
     };
 }
