@@ -29080,7 +29080,7 @@ async function run() {
                     number: issue.number
                 });
                 core.info(`closingIssuesReferences: ${repository.pullRequest?.closingIssuesReferences?.edges}`);
-                core.info(`issues ids: ${repository.pullRequest?.closingIssuesReferences?.edges?.map((issue) => issue.node.id)}`);
+                core.info(`issues ids: ${repository.pullRequest?.closingIssuesReferences?.edges?.map((issue) => issue.node.number)}`);
             }
         }
         // if it's a pull request, get all the info about the pull request
