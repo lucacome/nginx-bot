@@ -2,6 +2,9 @@ import * as core from '@actions/core'
 
 import * as github from '@actions/github'
 import { getInputs, Inputs } from './context'
+import { graphql } from '@octokit/graphql'
+import { Repository } from '@octokit/graphql-schema'
+
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -74,8 +77,40 @@ export async function run(): Promise<void> {
       await client.rest.issues.createComment({
         ...context.repo,
         issue_number: issue.number,
-        body: 'welcome change the message'
+        body: message
       })
+
+      if (issueType === 'pull request') {
+        // if it's a pull request, get linked issues from graphql
+        // const { pullRequestData } = await graphql({
+        const { repository } = await graphql<{ repository: Repository }>({
+          query: `
+						query($owner: String!, $name: String!, $number: Int!) {
+							repository(owner: $owner, name: $name) {
+					pullRequest(number: $number) {
+						id
+						closingIssuesReferences(first: 5) {
+							edges{
+							node {
+								id
+								body
+								number
+								title
+							}
+							}
+						}
+					}
+							}
+						}
+					`,
+          owner: context.repo.owner,
+          name: context.repo.repo,
+          number: issue.number
+        })
+        core.info(
+          `issue linked issues: ${repository.pullRequest?.closingIssuesReferences}`
+        )
+      }
     }
 
     // if it's a pull request, get all the info about the pull request
