@@ -29044,12 +29044,6 @@ async function run() {
             if (firstTimeContributor) {
                 message = message + 'ciao2';
             }
-            // add a comment to the issue
-            await client.rest.issues.createComment({
-                ...context.repo,
-                issue_number: issue.number,
-                body: message
-            });
             if (issueType === 'pull request') {
                 // if it's a pull request, get linked issues from graphql
                 // const { pullRequestData } = await graphql({
@@ -29079,8 +29073,19 @@ async function run() {
                     name: context.repo.repo,
                     number: issue.number
                 });
-                core.info(`closingIssuesReferences: ${repository.pullRequest?.closingIssuesReferences?.edges}`);
-                core.info(`issues ids: ${repository.pullRequest?.closingIssuesReferences?.edges?.map((issue) => issue.node.number)}`);
+                core.info(`linked issues numbers: ${repository.pullRequest?.closingIssuesReferences?.edges?.map((issue) => issue.node.number)}`);
+                const hasLinkedIssues = (repository.pullRequest?.closingIssuesReferences?.edges?.length ??
+                    0) > 0;
+                // if the PR doesn't have a linked issue, send a message to the PR author
+                if (!hasLinkedIssues) {
+                    message = message + 'ciao3';
+                }
+                // add a comment to the issue
+                await client.rest.issues.createComment({
+                    ...context.repo,
+                    issue_number: issue.number,
+                    body: message
+                });
             }
         }
         // if it's a pull request, get all the info about the pull request
