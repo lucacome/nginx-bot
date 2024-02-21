@@ -27,6 +27,17 @@ export async function run(): Promise<void> {
     core.info(`inputs: ${inputs}`)
     const client = github.getOctokit(inputs.githubToken)
 
+    core.startGroup(`Settings info`)
+    core.info(`replyToIssue: ${inputs.replyToIssue}`)
+    core.info(`replyToPullRequest: ${inputs.replyToPullRequest}`)
+    core.info(`messageIssue: ${inputs.messageIssue}`)
+    core.info(`messagePullRequest: ${inputs.messagePullRequest}`)
+    core.info(`externalContributorLabel: ${inputs.externalContributorLabel}`)
+    core.info(`pullRequestAssigneIssue: ${inputs.pullRequestAssigneIssue}`)
+    core.info(`warnMissingIssue: ${inputs.warnMissingIssue}`)
+    core.info(`missingIssueMessage: ${inputs.missingIssueMessage}`)
+    core.endGroup()
+
     const issueType = context.eventName === 'issues' ? 'issue' : 'pull request'
     const issue =
       issueType === 'issue'
