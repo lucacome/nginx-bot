@@ -26,15 +26,16 @@ inputs:
       'Message to send when an issue is opened by a community member. Only used
       if `reply-to-issues` is set to `true`'
     default: |
-      Thanks for opening this issue, please be sure to check out our [Contributing Guidelines](./CONTRIBUTING.md) and the [Issue Lifecycle](./ISSUE_LIFECYCLE.md) while you wait for somebody on the team to take a look at this.
+      Thanks for opening this issue!
+      Be sure to check out our [Contributing Guidelines](../blob/main/CONTRIBUTING.md) and the [Issue Lifecycle](../blob/main/ISSUE_LIFECYCLE.md) while you wait for someone on the team to take a look at this.
     required: false
   message-pr:
     description:
       'Message to send when a PR is opened by a community member. Only used if
       `reply-to-prs` is set to `true`'
-    default:
-      'Thanks for opening this pull request, please be sure to check out our
-      [Contributing Guidelines](./CONTRIBUTING.md)'
+    default: |
+      Thanks for opening this pull request!
+      Be sure to check out our [Contributing Guidelines](../blob/main/CONTRIBUTING.md) while you wait for someone on the team to review this.
     required: false
   external-contributor-label:
     description: 'Label to add to PRs from external contributors'
