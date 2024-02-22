@@ -69,10 +69,43 @@ export async function run(): Promise<void> {
 		core.info(`communityContributor: ${communityContributor}`)
 		core.info(`assignees: ${assignees}`)
 		core.info(`firstTimeContributor: ${firstTimeContributor}`)
-		core.info(`labels: ${issue.labels}`)
+		core.info(
+			`labels: ${issue.labels.map((label: { name: string }) => label.name)}`
+		)
 		core.endGroup()
 
+		const match = issue.body?.match(/```release-notes([\s\S]*?)```/)
+		let shouldAddLabel = false
+		let labels
+
+		if (match) {
+			const note = match[1].trim()
+			core.info(`release-notes: ${note}`)
+			shouldAddLabel = note.toUpperCase() !== 'NONE' && note !== ''
+		}
+
+		if (shouldAddLabel) {
+			;({ data: labels } = await client.rest.issues.addLabels({
+				...context.repo,
+				issue_number: issue.number,
+				labels: [inputs.releaseNotesLabel]
+			}))
+			core.debug(`Labels added: ${inputs.releaseNotesLabel}`)
+		} else {
+			try {
+				;({ data: labels } = await client.rest.issues.removeLabel({
+					...context.repo,
+					issue_number: issue.number,
+					name: inputs.releaseNotesLabel
+				}))
+				core.debug(`Label removed: ${inputs.releaseNotesLabel}`)
+			} catch (error) {
+				core.debug(`Label not found: ${inputs.releaseNotesLabel}`)
+			}
+		}
+
 		if (!communityContributor) {
+			core.info(`Labels: ${labels?.map(label => label.name)}`)
 			core.info(`Not a community contributor, exiting...`)
 			return
 		}
@@ -165,11 +198,11 @@ export async function run(): Promise<void> {
 			}
 		}
 
-		let { data: labels } = await client.rest.issues.addLabels({
+		;({ data: labels } = await client.rest.issues.addLabels({
 			...context.repo,
 			issue_number: issue.number,
 			labels: [inputs.externalContributorLabel]
-		})
+		}))
 
 		if (
 			inputs.pullRequestAssigneIssue !== '' &&
@@ -193,35 +226,6 @@ export async function run(): Promise<void> {
 				assignees: [...issueAssignees]
 			})
 			core.info(`Assignees added to the pull request: ${assignees}`)
-		}
-
-		const match = issue.body?.match(/```release-notes([\s\S]*?)```/)
-		let shouldAddLabel = false
-
-		if (match) {
-			const note = match[1].trim()
-			core.info(`release-notes: ${note}`)
-			shouldAddLabel = note.toUpperCase() !== 'NONE' && note !== ''
-		}
-
-		if (shouldAddLabel) {
-			;({ data: labels } = await client.rest.issues.addLabels({
-				...context.repo,
-				issue_number: issue.number,
-				labels: [inputs.releaseNotesLabel]
-			}))
-			core.debug(`Labels added: ${inputs.releaseNotesLabel}`)
-		} else {
-			try {
-				;({ data: labels } = await client.rest.issues.removeLabel({
-					...context.repo,
-					issue_number: issue.number,
-					name: inputs.releaseNotesLabel
-				}))
-				core.debug(`Label removed: ${inputs.releaseNotesLabel}`)
-			} catch (error) {
-				core.debug(`Label not found: ${inputs.releaseNotesLabel}`)
-			}
 		}
 		core.info(`Labels: ${labels.map(label => label.name)}`)
 		// Set outputs for other workflow steps to use
