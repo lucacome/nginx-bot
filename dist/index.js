@@ -29041,6 +29041,7 @@ async function run() {
         core.startGroup(`Issue info`);
         core.info(`issueType: ${issueType}`);
         core.info(`issueNumber: ${issueNumber}`);
+        core.info(`authorAssociation: ${issue.author_association}`);
         core.info(`communityContributor: ${communityContributor}`);
         core.info(`assignees: ${assignees}`);
         core.info(`firstTimeContributor: ${firstTimeContributor}`);
@@ -29130,7 +29131,6 @@ async function run() {
                 }
             }
             message = `${message}\n\n${COMMENT_MARKER}`;
-            core.info(`message: ${message}`);
             const { data: comments } = await client.rest.issues.listComments({
                 ...context.repo,
                 issue_number: issue.number
@@ -29150,6 +29150,7 @@ async function run() {
                     body: message
                 });
             }
+            core.info(`message sent: ${message}`);
         }
         ;
         ({ data: labels } = await client.rest.issues.addLabels({
