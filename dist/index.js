@@ -28988,8 +28988,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-const context_1 = __nccwpck_require__(8954);
 const graphql_1 = __nccwpck_require__(8467);
+const context_1 = __nccwpck_require__(8954);
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -29047,35 +29047,39 @@ async function run() {
             core.info(`Not a community contributor, exiting...`);
             return;
         }
-        const shouldReply = issueType === 'issue' ? inputs.replyToIssue : inputs.replyToPullRequest;
+        const shouldReply = issueType === 'issue'
+            ? inputs.replyToIssue
+            : inputs.replyToPullRequest;
         if (shouldReply) {
             const COMMENT_MARKER = '<!-- nginx-bot-comment -->';
-            var message = `Hi @${issue.user.login}!`;
+            let message = `Hi @${issue.user.login}!`;
             if (firstTimeContributor) {
-                message = message + ` Welcome to the project! 🎉`;
+                message = `${message} Welcome to the project! 🎉`;
             }
-            const issueMessage = issueType === 'issue' ? inputs.messageIssue : inputs.messagePullRequest;
-            message = message + `\n\n${issueMessage}`;
+            const issueMessage = issueType === 'issue'
+                ? inputs.messageIssue
+                : inputs.messagePullRequest;
+            message = `${message}\n\n${issueMessage}`;
             if (issueType === 'pull request' && inputs.warnMissingIssue) {
                 const { repository } = await (0, graphql_1.graphql)({
                     query: `
-			query ($owner: String!, $name: String!, $number: Int!) {
-				repository(owner: $owner, name: $name) {
-					pullRequest(number: $number) {
-					id
-					closingIssuesReferences(first: 5) {
-						edges {
-						  node {
-							id
-							body
-							number
-							title
-						  }
-						}
-					}
-					}
-				}
-			}`,
+						query ($owner: String!, $name: String!, $number: Int!) {
+							repository(owner: $owner, name: $name) {
+								pullRequest(number: $number) {
+								id
+								closingIssuesReferences(first: 5) {
+									edges {
+									node {
+										id
+										body
+										number
+										title
+									}
+									}
+								}
+								}
+							}
+						}`,
                     headers: {
                         authorization: `token ${inputs.githubToken}`
                     },
@@ -29083,14 +29087,14 @@ async function run() {
                     name: context.repo.repo,
                     number: issue.number
                 });
-                core.info(`linked issues numbers: ${repository.pullRequest?.closingIssuesReferences?.edges?.map((issue) => issue.node.number)}`);
-                const hasLinkedIssues = (repository.pullRequest?.closingIssuesReferences?.edges?.length ??
-                    0) > 0;
+                core.info(`linked issues numbers: ${repository.pullRequest?.closingIssuesReferences?.edges?.map(issueFound => issueFound?.node?.number)}`);
+                const hasLinkedIssues = (repository.pullRequest?.closingIssuesReferences?.edges
+                    ?.length ?? 0) > 0;
                 if (!hasLinkedIssues) {
-                    message = message + `\n\n${inputs.missingIssueMessage}`;
+                    message = `${message}\n\n${inputs.missingIssueMessage}`;
                 }
             }
-            message = message + `\n\n${COMMENT_MARKER}`;
+            message = `${message}\n\n${COMMENT_MARKER}`;
             core.info(`message: ${message}`);
             const { data: comments } = await client.rest.issues.listComments({
                 ...context.repo,
@@ -29125,11 +29129,11 @@ async function run() {
                 ...context.repo,
                 issue_number: communityIssueNumber
             });
-            const assignees = communityIssue.assignees?.map(assignee => assignee.login) ?? [];
+            const issueAssignees = communityIssue.assignees?.map(assignee => assignee.login) ?? [];
             await client.rest.issues.addAssignees({
                 ...context.repo,
                 issue_number: issue.number,
-                assignees: [...assignees]
+                assignees: [...issueAssignees]
             });
             core.info(`Assignees added to the pull request: ${assignees}`);
         }
