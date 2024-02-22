@@ -26,8 +26,7 @@ inputs:
       'Message to send when an issue is opened by a community member. Only used
       if `reply-to-issues` is set to `true`'
     default: |
-      Thanks for opening this issue, please be sure to check out our [Contributing Guidelines](./CONTRIBUTING.md)
-      and the [Issue Lifecycle](./ISSUE_LIFECYCLE.md) while you wait for somebody on the team to take a look at this.
+      Thanks for opening this issue, please be sure to check out our [Contributing Guidelines](./CONTRIBUTING.md) and the [Issue Lifecycle](./ISSUE_LIFECYCLE.md) while you wait for somebody on the team to take a look at this.
     required: false
   message-pr:
     description:
