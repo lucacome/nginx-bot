@@ -29034,13 +29034,16 @@ async function run() {
         // none is probably a bot account
         const communityContributor = issue?.author_association !== 'MEMBER' &&
             issue?.author_association !== 'COLLABORATOR' &&
-            issue?.author_association !== 'NONE';
+            issue?.author_association !== 'NONE' &&
+            issue?.user.type === 'User';
         const firstTimeContributor = issue?.author_association === 'FIRST_TIME_CONTRIBUTOR';
         const issueNumber = issue.number;
         const assignees = issue.assignees;
         core.startGroup(`Issue info`);
         core.info(`issueType: ${issueType}`);
         core.info(`issueNumber: ${issueNumber}`);
+        core.info(`issueAuthor: ${issue.user.login}`);
+        core.info(`issueUserType: ${issue.user.type}`);
         core.info(`authorAssociation: ${issue.author_association}`);
         core.info(`communityContributor: ${communityContributor}`);
         core.info(`assignees: ${assignees}`);
