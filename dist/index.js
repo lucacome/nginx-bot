@@ -29129,6 +29129,7 @@ async function run() {
                 core.info(`linked issues numbers: ${repository.pullRequest?.closingIssuesReferences?.edges?.map(issueFound => issueFound?.node?.number)}`);
                 const hasLinkedIssues = (repository.pullRequest?.closingIssuesReferences?.edges
                     ?.length ?? 0) > 0;
+                core.debug(`hasLinkedIssues: ${hasLinkedIssues}`);
                 if (!hasLinkedIssues) {
                     message = `${message}\n\n${inputs.missingIssueMessage}`;
                 }
@@ -29139,6 +29140,7 @@ async function run() {
                 issue_number: issue.number
             });
             const existingComment = comments.find(comment => comment.body?.includes(COMMENT_MARKER));
+            core.debug(`existingComment: ${existingComment}`);
             if (existingComment) {
                 await client.rest.issues.updateComment({
                     ...context.repo,
@@ -29161,21 +29163,24 @@ async function run() {
             issue_number: issue.number,
             labels: [inputs.externalContributorLabel]
         }));
+        core.debug(`Labels added: ${inputs.externalContributorLabel} and existing labels: ${labels.map(label => label.name)}`);
         if (inputs.pullRequestAssigneIssue !== '' &&
             issueType === 'pull request' &&
             issue.assignees.length === 0) {
+            core.debug(`The pull request has no assignees, adding assignees...`);
             const communityIssueNumber = parseInt(inputs.pullRequestAssigneIssue);
             const { data: communityIssue } = await client.rest.issues.get({
                 ...context.repo,
                 issue_number: communityIssueNumber
             });
             const issueAssignees = communityIssue.assignees?.map(assignee => assignee.login) ?? [];
-            await client.rest.issues.addAssignees({
+            core.debug(`Issue ${communityIssueNumber} assignees: ${issueAssignees}`);
+            const { data: newAssignees } = await client.rest.issues.addAssignees({
                 ...context.repo,
                 issue_number: issue.number,
                 assignees: [...issueAssignees]
             });
-            core.info(`Assignees added to the pull request: ${assignees}`);
+            core.info(`New assignees: ${newAssignees.assignees}`);
         }
         core.info(`Labels: ${labels.map(label => label.name)}`);
         // Set outputs for other workflow steps to use
